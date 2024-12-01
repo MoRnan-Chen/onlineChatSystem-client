@@ -6,6 +6,7 @@
   import EmojiPicker from "vue3-emoji-picker";
   import "vue3-emoji-picker/css";
   import { GrinningFace } from '@icon-park/vue-next';
+  import useWebSocket from '@/utils/useWebSocket';
 
   const  userInfoStore = useUserInfoStore();
 
@@ -25,10 +26,7 @@
 
   //控制表情框的显示
   const showDialog = ref(false);
-  //创建websocket连接
-  const socket = new WebSocket(`ws://localhost:8080/singleChat/${userInfoStore.info.id}`);
 
-  
   //获取好友列表
   const getFriendList = async () => {
     let result = await getFriendListService();
@@ -49,32 +47,41 @@
     messages.value=result.data;
   };
 
-  const sendMessage = async() => {
-    if (newMessage.value.content.trim() === '') return;
-
-    
-    newMessage.value.fromId = userInfoStore.info.id;
-    newMessage.value.toId = currentFriend.value.id;
-    newMessage.value.type = 0;
-    // 将消息添加到本地消息列表中
-    messages.value.push({ ...newMessage.value });
-
-    // 在这里实现通过 WebSocket 发送消息的逻辑
-    socket.send(JSON.stringify(newMessage.value));
-
-    // 清空输入框
-    newMessage.value.content = '';
+  // 处理收到的 WebSocket 消息
+  const handleMessage = (event) => {
+    messages.value.push(JSON.parse(event.data));
   };
-  socket.onmessage = async e=>{
-    //将获取的数据添加到数组中
-    messages.value.push(JSON.parse(e.data));
+
+  // 使用可组合函数初始化 WebSocket
+const { sendMessage: sendSocketMessage } = useWebSocket(
+  `ws://localhost:8080/singleChat/${userInfoStore.info.id}`,
+  handleMessage
+);
+
+// 发送消息的函数
+const sendMessage = () => {
+  if (newMessage.value.content.trim() === '') return;
+
+  newMessage.value.fromId = userInfoStore.info.id;
+  newMessage.value.toId = currentFriend.value.id;
+  newMessage.value.type = 0;
+
+  // 通过 WebSocket 发送消息
+  if(sendSocketMessage(JSON.stringify(newMessage.value)))
+  {
+  //如果发送成功，将消息添加到本地消息数组中
+  messages.value.push({ ...newMessage.value });
   }
+
+  // 清空输入框
+  newMessage.value.content = '';
+};
   //选择表情
   const selectEmoji = emoji=>{
     //将表情拼接要发送的信息里
     newMessage.value.content = newMessage.value.content+emoji.i;
   }
-  
+
 </script>
 
 <template>
