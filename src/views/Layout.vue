@@ -65,11 +65,12 @@ const logout = () => {
     <el-container>
       <el-aside width="65px" >
         <el-menu 
+        default-active="/chat"
         active-text-color="#54FF9F"
         background-color="#2e2e2e"
-        text-color="#fff"
-        default-active="/chat"
-        router>
+        text-color="#fff"       
+        router="true"
+        >
 
           
         

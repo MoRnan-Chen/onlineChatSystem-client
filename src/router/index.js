@@ -8,7 +8,7 @@ import UpdateUserInfoVue from "@/views/UpdateUserInfo.vue";
 //定义路由关系
 const routes = [
     {path:'/login',component:LoginVue},
-    {path:'/',component:LayoutVue,
+    {path:'/',component:LayoutVue,redirect: '/chat',
         //子路由
         children:[
             {path:'chat',component:ChatVue},
