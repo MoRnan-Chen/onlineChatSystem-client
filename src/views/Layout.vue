@@ -5,7 +5,8 @@ import {
   Orange,
   Avatar,
   ChatDotRound,
-  SwitchButton
+  SwitchButton,
+  ChatLineRound
   
 } from '@element-plus/icons-vue'
 
@@ -70,10 +71,7 @@ const logout = () => {
         background-color="#2e2e2e"
         text-color="#fff"       
         router="true"
-        >
-
-          
-        
+        >    
           <el-menu-item class="avatar-menu">       
               <el-avatar
                 shape="square"
@@ -87,10 +85,14 @@ const logout = () => {
             <el-icon><ChatDotRound /></el-icon>
           </el-menu-item>
 
-          <el-menu-item index="2">
+          <el-menu-item index="/group-chat">
+            <el-icon><ChatLineRound /></el-icon>
+          </el-menu-item>
+
+          <el-menu-item index="contacts">
             <el-icon><User /></el-icon>
           </el-menu-item>
-          <el-menu-item index="3">
+          <el-menu-item index="moments">
             <el-icon><Orange /></el-icon>
           </el-menu-item>
           <el-menu-item index="/updateUserInfo">
