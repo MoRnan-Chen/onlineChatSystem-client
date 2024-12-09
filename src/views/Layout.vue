@@ -85,7 +85,7 @@ const logout = () => {
             <el-icon><ChatDotRound /></el-icon>
           </el-menu-item>
 
-          <el-menu-item index="/group-chat">
+          <el-menu-item index="/groupChat">
             <el-icon><ChatLineRound /></el-icon>
           </el-menu-item>
 

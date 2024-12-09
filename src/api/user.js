@@ -44,3 +44,14 @@ export const updateBaseUserInfoService = (baseUserInfoData)=>{
       params: { myId, friendId }
   });
  }
+
+   //搜索好友
+   export const searchUsersService = (keyword)=>{
+    return request.get('/user/searchUsers',{
+        params:{keyword}
+    })
+  }
+//添加好友
+  export const addFriendService = (userId) => {
+    return request.post('/friends/add', { userId });
+  };

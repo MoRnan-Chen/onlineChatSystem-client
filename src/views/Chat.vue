@@ -1,12 +1,13 @@
 <script setup>
   import { Search, Plus } from '@element-plus/icons-vue'
-  import { getFriendListService,getFriendChatRecordService } from '@/api/user';
+  import { getFriendListService,getFriendChatRecordService, searchUsersService,addFriendService } from '@/api/user';
   import { ref } from 'vue';
   import useUserInfoStore from '@/stores/userInfo';
   import EmojiPicker from "vue3-emoji-picker";
   import "vue3-emoji-picker/css";
   import { GrinningFace } from '@icon-park/vue-next';
   import useWebSocket from '@/utils/useWebSocket';
+import { ElMessage } from 'element-plus';
 
   const  userInfoStore = useUserInfoStore();
 
@@ -14,7 +15,8 @@
   const defaultAvatar = ref('https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png');
 
   const friendList = ref([])
-  const search = ref('');
+  const keyword = ref('');
+  const searchList = ref([]); 
   const currentFriend = ref(null);
   const messages = ref([]);
   const newMessage = ref({
@@ -26,6 +28,9 @@
 
   //控制表情框的显示
   const showDialog = ref(false);
+
+  //控制搜索列表的显示
+  const dialogSearchVisible = ref(false);
 
   //获取好友列表
   const getFriendList = async () => {
@@ -82,6 +87,33 @@ const sendMessage = () => {
     newMessage.value.content = newMessage.value.content+emoji.i;
   }
 
+  //搜索用户
+ const searchUsers=async()=>
+  {
+    if(!keyword.value || typeof keyword.value !== 'string' || keyword.value.trim() === ''){
+      ElMessage.warning("搜索内容不能为空！");
+    }else{
+      let result = await searchUsersService(keyword.value);
+      searchList.value = result.data;
+      dialogSearchVisible.value = true;
+    }
+  }
+// 添加好友的函数
+  const addFriend = async (user) => {
+  try {
+    const response = await addFriendService(user.id);
+    if(response.data.success){
+      ElMessage.success('好友请求已发送');
+      // 可选：更新好友列表或搜索列表状态，例如禁用按钮或更改按钮文本
+    } else {
+      ElMessage.error(response.data.message || '发送好友请求失败');
+    }
+  } catch (error) {
+    ElMessage.error('发送好友请求失败');
+    console.error(error);
+  }
+};
+
 </script>
 
 <template>
@@ -90,14 +122,31 @@ const sendMessage = () => {
     <el-aside width="18vw">
       <div class="search-layout">
         <el-input
-          v-model="search"
+          v-model="keyword"
           placeholder="搜索"
           style="width: 14vw"
           :prefix-icon="Search"
+          @keyup.enter="searchUsers"
         />
-        <el-icon style="margin-left: 8px; background-color: #ffffff;" size="24">
-          <Plus />
+        <el-icon style="margin-left: 8px; background-color: #ffffff;" 
+        size="24" color="#606266" @click="searchUsers">
+          <Search />
         </el-icon>
+        <!-- 搜索结果框 -->
+        <el-dialog  v-model="dialogSearchVisible" title="搜索结果" width="400px">
+          <el-scrollbar style="max-height: 300px; overflow-y: auto;">
+    <template v-if="searchList.length > 0">
+      <div v-for="user in searchList" :key="user.id" class="search-result-item">
+        <el-avatar :src="user.userPic ? user.userPic : defaultAvatar" size="32"></el-avatar>
+        <span class="user-name">{{ user.username }}</span>
+        <el-button type="primary" size="mini" @click="addFriend(user)">添加</el-button>
+      </div>
+    </template>
+    <template v-else>
+      <p>没有找到相关用户。</p>
+    </template>
+  </el-scrollbar>
+        </el-dialog>
       </div>
 
       <el-divider style="margin: 0; width: 18vw;" class="horizontal-divider" direction="horizontal" />
@@ -413,4 +462,26 @@ const sendMessage = () => {
   z-index: 1000;
 }
 
+/* 新增搜索结果项的样式 */
+.search-result-item {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.search-result-item:last-child {
+  border-bottom: none;
+}
+
+.search-result-item .user-name {
+  flex: 1;
+  margin-left: 10px;
+  font-size: 16px;
+  color: #333;
+}
+
+.search-result-item .el-button {
+  margin-left: 10px;
+}
 </style>
