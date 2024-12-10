@@ -53,5 +53,5 @@ export const updateBaseUserInfoService = (baseUserInfoData)=>{
   }
 //添加好友
   export const addFriendService = (userId) => {
-    return request.post('/friends/add', { userId });
+    return request.post('/user/addFriend', { userId });
   };

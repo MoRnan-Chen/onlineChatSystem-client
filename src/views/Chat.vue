@@ -100,18 +100,10 @@ const sendMessage = () => {
   }
 // 添加好友的函数
   const addFriend = async (user) => {
-  try {
-    const response = await addFriendService(user.id);
-    if(response.data.success){
-      ElMessage.success('好友请求已发送');
-      // 可选：更新好友列表或搜索列表状态，例如禁用按钮或更改按钮文本
-    } else {
-      ElMessage.error(response.data.message || '发送好友请求失败');
-    }
-  } catch (error) {
-    ElMessage.error('发送好友请求失败');
-    console.error(error);
-  }
+  
+    const result = await addFriendService(user.id);
+    ElMessage.success("好友添加发送成功！");
+
 };
 
 </script>
