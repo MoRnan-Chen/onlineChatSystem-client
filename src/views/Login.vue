@@ -13,9 +13,10 @@ const registerData = ref({
 });
 //登录表单数据
 const loginData = ref({
-    username: '',
-    password: ''
+    username: 'MoRan',  // 设置默认账号
+    password: '003325'  // 设置默认密码
 });
+
 //注册时候的校验规则
 const registerRules = {
     username: [
